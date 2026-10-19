@@ -130,3 +130,34 @@ std::string& toLower(std::string& str)
 	}
 	return str;
 }
+std::string& replace(std::string& str, std::string target, std::string source, bool isAll)
+{
+	if (str.size() == 0 || target.size() == 0)
+		return str;
+	size_t size = source.size();
+	size_t length = target.size();
+	size_t pos = 0;
+	while (pos < str.size())
+	{
+		size_t res = str.find(target, pos);
+		if (res == std::string::npos)
+			break;
+		str.replace(res, length, source);
+		if (isAll == false)
+			break;
+		pos = res + size;
+	}
+	return str;
+}
+void pickNumber(std::string& source, std::string& destination, bool hasSign, bool hasDot)
+{
+	for (auto chr : source)
+	{
+		if (isdigit(chr))
+			destination.push_back(chr);
+		else if (hasSign == true && (chr == '+' || chr == '-'))
+			destination.push_back(chr);
+		else if (hasDot == true && chr == '.')
+			destination.push_back(chr);
+	}
+}

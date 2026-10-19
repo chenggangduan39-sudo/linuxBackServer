@@ -10,3 +10,5 @@ char* toUpper(char* str);
 std::string& toUpper(std::string& str);
 char* toLower(char* str);
 std::string& toLower(std::string& str);
+std::string& replace(std::string& str, std::string target, std::string source, bool isAll = false);
+void pickNumber(std::string& source, std::string& destination, bool hasSign, bool hasDot);

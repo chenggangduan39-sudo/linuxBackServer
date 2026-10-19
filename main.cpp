@@ -2,11 +2,12 @@
 #include <iostream>
 int main()
 {
-	char str[] = "HELLO!";
+	std::string str = "abc-23.56";
 	std::cout << str << std::endl;
-	std::cout << strlen(str) << std::endl;
-	toLower(str);
-	std::cout << str << std::endl;
-	std::cout << strlen(str) << std::endl;
+	// std::cout << strlen(str) << std::endl;
+	std::string target;
+	pickNumber(str, target, true, true);
+	std::cout << target << std::endl;
+	// std::cout << strlen(str) << std::endl;
 	return 0;
 }
