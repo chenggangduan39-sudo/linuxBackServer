@@ -1,0 +1,10 @@
+{
+  "configurations": [
+    {
+      "name": "Linux",
+      "compilerPath": "/usr/bin/g++",
+      "includePath": ["/projects/back/public"]
+    }
+  ],
+  "version": 4
+}

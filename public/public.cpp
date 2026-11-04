@@ -1,4 +1,5 @@
 #include "public.h"
+#include <iostream>
 char* deleteLeftChar(char* str, char target)
 {
 	if (str == nullptr)
@@ -104,7 +105,7 @@ char* toUpper(char* str)
 }
 std::string& toUpper(std::string& str)
 {
-	for (auto chr : str)
+	for (auto& chr : str)
 	{
 		if (chr >= 'a' && chr <= 'z')
 			chr -= 32;
@@ -123,7 +124,7 @@ char* toLower(char* str)
 }
 std::string& toLower(std::string& str)
 {
-	for (auto chr : str)
+	for (auto& chr : str)
 	{
 		if (chr >= 'A' && chr <= 'Z')
 			chr += 32;
@@ -160,4 +161,31 @@ void pickNumber(std::string& source, std::string& destination, bool hasSign, boo
 		else if (hasDot == true && chr == '.')
 			destination.push_back(chr);
 	}
+}
+void StringSplitter::split(const std::string& str, const std::string delimiter)
+{
+	if (fields.size() != 0)
+		fields.clear();
+	if (delimiter.empty())
+		return;
+	size_t pos = 0;
+	size_t start = 0;
+	while (start <= str.size())
+	{
+		pos = str.find(delimiter, start);
+		std::string field = str.substr(start, pos - start);
+		fields.push_back(field);
+		if (pos != std::string::npos)
+			start = pos + delimiter.size();
+		else
+			break;
+	}
+}
+const std::string& StringSplitter::operator[](int i)
+{
+	return fields[i];
+}
+int StringSplitter::size()
+{
+	return fields.size();
 }

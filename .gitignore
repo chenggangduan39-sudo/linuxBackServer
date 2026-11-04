@@ -1,0 +1,14 @@
+# Compiled objects and libraries
+*.o
+*.obj
+*.a
+*.so
+*.so.*
+*.dll
+*.exe
+*.out
+# Test executables
+/public/main
+/public/test_split
+/public/test/main
+/public/test/test_split
