@@ -1,5 +1,6 @@
 #include "public.h"
-#include <iostream>
+#include <stdio.h>
+#include <time.h>
 char* deleteLeftChar(char* str, char target)
 {
 	if (str == nullptr)
@@ -150,7 +151,7 @@ std::string& replace(std::string& str, std::string target, std::string source, b
 	}
 	return str;
 }
-void pickNumber(std::string& source, std::string& destination, bool hasSign, bool hasDot)
+void pickNumber(const std::string& source, std::string& destination, bool hasSign, bool hasDot)
 {
 	for (auto chr : source)
 	{
@@ -188,4 +189,70 @@ const std::string& StringSplitter::operator[](int i)
 int StringSplitter::size()
 {
 	return fields.size();
+}
+std::string timeToString(time_t timePoint, const std::string& fmt)
+{
+	std::string time;
+	tm localTime;
+	localtime_r(&timePoint, &localTime);
+	int year = localTime.tm_year + 1900;
+	int month = localTime.tm_mon + 1;
+	int day = localTime.tm_mday;
+	int hour = localTime.tm_hour;
+	int minute = localTime.tm_min;
+	int second = localTime.tm_sec;
+	if (fmt == "" || fmt == "yyyy-mm-dd hh:mi:ss")
+		time = sformat("%04d-%02d-%02d %02d:%02d:%02d", year, month, day, hour, minute, second);
+	return time;
+}
+std::string getTime(const std::string& fmt, int offsetSeconds)
+{
+	time_t now = time(nullptr);
+	time_t timePoint = now + offsetSeconds;
+	std::string res = timeToString(timePoint, fmt);
+	return res;
+}
+time_t stringToTime(const std::string& textTime)
+{
+	std::string destination;
+	pickNumber(textTime, destination, false, false);
+	if (destination.size() != 14)
+		return -1;
+	std::vector<std::string> timeElements;
+	int ptr = 0;
+	for (int i = 0; i < 6; i++)
+	{
+		std::string timeElement;
+		if (i == 0)
+		{
+			timeElement = destination.substr(ptr, 4);
+			ptr += 4;
+		}
+		else
+		{
+			timeElement = destination.substr(ptr, 2);
+			ptr += 2;
+		}
+		timeElements.push_back(timeElement);
+	}
+	tm timePoint;
+	timePoint.tm_isdst = 0;
+	timePoint.tm_year = std::stoi(timeElements[0]) - 1900;
+	timePoint.tm_mon = std::stoi(timeElements[1]) - 1;
+	timePoint.tm_mday = std::stoi(timeElements[2]);
+	timePoint.tm_hour = std::stoi(timeElements[3]);
+	timePoint.tm_min = std::stoi(timeElements[4]);
+	timePoint.tm_sec = std::stoi(timeElements[5]);
+	time_t time = mktime(&timePoint);
+	return time;
+}
+std::string calculateTime(const std::string& textTime, int offsetSeconds, const std::string& fmt)
+{
+	std::string time;
+	time_t timePoint = stringToTime(textTime);
+	if (timePoint == -1)
+		return time;
+	time_t newTime = timePoint + offsetSeconds;
+	time = timeToString(newTime, fmt);
+	return time;
 }

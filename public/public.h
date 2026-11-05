@@ -24,3 +24,18 @@ public:
 	const std::string& operator[](int i);
 	int size();
 };
+template <typename... Args>
+std::string sformat(const char* fmt, Args... args)
+{
+	std::string buffer;
+	int length = snprintf(nullptr, 0, fmt, args...);
+	if (length < 0)
+		return buffer;
+	buffer.resize(length + 1);
+	snprintf(&buffer[0], length + 1, fmt, args...);
+	return buffer;
+}
+std::string timeToString(time_t timePoint, const std::string& fmt);
+std::string getTime(const std::string& fmt = "", int offsetSeconds = 0);
+time_t stringToTime(const std::string& textTime);
+std::string calculateTime(const std::string& textTime, int offsetSeconds, const std::string& fmt = "");
