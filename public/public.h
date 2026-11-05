@@ -39,3 +39,14 @@ std::string timeToString(time_t timePoint, const std::string& fmt);
 std::string getTime(const std::string& fmt = "", int offsetSeconds = 0);
 time_t stringToTime(const std::string& textTime);
 std::string calculateTime(const std::string& textTime, int offsetSeconds, const std::string& fmt = "");
+class Stopwatch
+{
+private:
+	timeval startTime;
+	timeval endTime;
+
+public:
+	Stopwatch();
+	void start();
+	double elapsed();
+};

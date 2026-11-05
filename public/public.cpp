@@ -1,6 +1,7 @@
 #include "public.h"
 #include <stdio.h>
 #include <time.h>
+#include <sys/time.h>
 char* deleteLeftChar(char* str, char target)
 {
 	if (str == nullptr)
@@ -255,4 +256,34 @@ std::string calculateTime(const std::string& textTime, int offsetSeconds, const 
 	time_t newTime = timePoint + offsetSeconds;
 	time = timeToString(newTime, fmt);
 	return time;
+}
+/*
+class Stopwatch
+{
+private:
+  timeval startTime;
+  timeval endTime;
+
+public:
+  Stopwatch();
+  void start();
+  double elapsed();
+};
+*/
+Stopwatch::Stopwatch()
+{
+	start();
+}
+void Stopwatch::start()
+{
+	gettimeofday(&startTime, nullptr);
+}
+double Stopwatch::elapsed()
+{
+	gettimeofday(&endTime, nullptr);
+	double startPoint = startTime.tv_sec * 1000000 + startTime.tv_usec;
+	double endPoint = endTime.tv_sec * 1000000 + endTime.tv_usec;
+	double elapsed = (endPoint - startPoint) / 1000000;
+	start();
+	return elapsed;
 }
