@@ -50,3 +50,8 @@ public:
 	void start();
 	double elapsed();
 };
+bool createDirectory(const std::string& pathname, bool isFileName);
+bool renameFile(const std::string& srcFile, const std::string& dstFile);
+off_t getFileSize(const std::string& fileName);
+std::string getFileModificationTime(const std::string& fileName, const std::string& fmt = "");
+bool setFileModificationTime(const std::string& fileName, const std::string& time);

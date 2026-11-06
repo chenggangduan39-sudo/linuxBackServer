@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/time.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <utime.h>
 char* deleteLeftChar(char* str, char target)
 {
 	if (str == nullptr)
@@ -257,19 +260,6 @@ std::string calculateTime(const std::string& textTime, int offsetSeconds, const 
 	time = timeToString(newTime, fmt);
 	return time;
 }
-/*
-class Stopwatch
-{
-private:
-  timeval startTime;
-  timeval endTime;
-
-public:
-  Stopwatch();
-  void start();
-  double elapsed();
-};
-*/
 Stopwatch::Stopwatch()
 {
 	start();
@@ -286,4 +276,69 @@ double Stopwatch::elapsed()
 	double elapsed = (endPoint - startPoint) / 1000000;
 	start();
 	return elapsed;
+}
+bool createDirectory(const std::string& pathName, bool isFileName)
+{
+	if (access(pathName.c_str(), F_OK) == 0)
+		return true;
+	int pos = 1;
+	std::string subDir;
+	while (subDir != pathName)
+	{
+		size_t next = pathName.find('/', pos);
+		if (next == std::string::npos && isFileName == true)
+			return true;
+		subDir += pathName.substr(pos - 1, next - pos + 1);
+		if (access(subDir.c_str(), F_OK) != 0)
+		{
+			int res = mkdir(subDir.c_str(), 0755);
+			if (res == -1)
+				return false;
+		}
+		pos = next + 1;
+	}
+	return true;
+}
+bool renameFile(const std::string& srcFile, const std::string& dstFile)
+{
+	if (access(srcFile.c_str(), F_OK) != 0)
+		return false;
+	if (createDirectory(dstFile, true) == false)
+		return false;
+	if (rename(srcFile.c_str(), dstFile.c_str()) == 0)
+		return true;
+	else
+		return false;
+}
+off_t getFileSize(const std::string& fileName)
+{
+	struct stat st;
+	int res = stat(fileName.c_str(), &st);
+	if (res == -1)
+		return -1;
+	return st.st_size;
+}
+std::string getFileModificationTime(const std::string& fileName, const std::string& fmt)
+{
+	std::string time;
+	struct stat st;
+	int res = stat(fileName.c_str(), &st);
+	if (res == -1)
+		return time;
+	time = timeToString(st.st_mtime, fmt);
+	return time;
+}
+bool setFileModificationTime(const std::string& fileName, const std::string& time)
+{
+	utimbuf mtime;
+	time_t dstTime = stringToTime(time);
+	if (dstTime == -1)
+		return false;
+	mtime.actime = dstTime;
+	mtime.modtime = dstTime;
+	int res = utime(fileName.c_str(), &mtime);
+	if (res == 0)
+		return true;
+	else
+		return false;
 }
