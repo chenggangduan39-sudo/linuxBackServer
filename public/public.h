@@ -55,3 +55,5 @@ bool renameFile(const std::string& srcFile, const std::string& dstFile);
 off_t getFileSize(const std::string& fileName);
 std::string getFileModificationTime(const std::string& fileName, const std::string& fmt = "");
 bool setFileModificationTime(const std::string& fileName, const std::string& time);
+bool copyFile(const std::string& srcFileName, const std::string& dstFileName);
+bool matchstr(const std::string& str, const std::string& rules);

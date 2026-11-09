@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <utime.h>
+#include <fstream>
 char* deleteLeftChar(char* str, char target)
 {
 	if (str == nullptr)
@@ -341,4 +342,75 @@ bool setFileModificationTime(const std::string& fileName, const std::string& tim
 		return true;
 	else
 		return false;
+}
+bool copyFile(const std::string& srcFileName, const std::string& dstFileName)
+{
+	if (srcFileName == dstFileName)
+		return true;
+	std::ifstream ifs;
+	std::ofstream ofs;
+	ifs.open(srcFileName, std::ios::binary | std::ios::in);
+	if (ifs.is_open() == false)
+		return false;
+	std::string buffer;
+	buffer.resize(1024);
+	ofs.open(dstFileName, std::ios::binary | std::ios::out);
+	if (ofs.is_open() == false)
+	{
+		bool res = createDirectory(dstFileName, true);
+		if (res == false)
+			return false;
+		ofs.open(dstFileName, std::ios::binary | std::ios::out);
+	}
+	while (true)
+	{
+		ifs.read(&buffer[0], 1024);
+		std::streamsize count = ifs.gcount();
+		if (count == 0)
+			break;
+		ofs.write(&buffer[0], count);
+	}
+	ifs.close();
+	ofs.close();
+	std::string mtime = getTime();
+	setFileModificationTime(dstFileName, mtime);
+	return true;
+}
+bool matchstr(const std::string& str, const std::string& rules)
+{
+	if (rules.length() == 0)
+		return false;
+	if (rules == "*")
+		return true;
+	int ii, jj;
+	int pos1, pos2;
+	StringSplitter cmdstr, cmdsubstr;
+	std::string filename = str;
+	std::string matchstr = rules;
+	toUpper(filename);
+	toUpper(matchstr);
+	cmdstr.split(matchstr, ",");
+	for (ii = 0; ii < cmdstr.size(); ii++)
+	{
+		if (cmdstr[ii].empty() == true)
+			continue;
+		pos1 = pos2 = 0;
+		cmdsubstr.split(cmdstr[ii], "*");
+		for (jj = 0; jj < cmdsubstr.size(); jj++)
+		{
+			if (jj == 0)
+				if (filename.substr(0, cmdsubstr[jj].length()) != cmdsubstr[jj])
+					break;
+			if (jj == cmdsubstr.size() - 1)
+				if (filename.find(cmdsubstr[jj], filename.length() - cmdsubstr[jj].length()) == std::string::npos)
+					break;
+			pos2 = filename.find(cmdsubstr[jj], pos1);
+			if (pos2 == std::string::npos)
+				break;
+			pos1 = pos2 + cmdsubstr[jj].length();
+		}
+		if (jj == cmdsubstr.size())
+			return true;
+	}
+	return false;
 }
