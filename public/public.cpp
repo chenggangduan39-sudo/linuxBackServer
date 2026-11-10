@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <utime.h>
+#include <dirent.h>
+#include <iostream>
 #include <fstream>
 char* deleteLeftChar(char* str, char target)
 {
@@ -413,4 +415,35 @@ bool matchstr(const std::string& str, const std::string& rules)
 			return true;
 	}
 	return false;
+}
+void DirectoryScanner::scan(const std::string& pathName, const std::string& rules, bool isDeep)
+{
+	DIR* dirp = opendir(pathName.data());
+	if (dirp == nullptr)
+		return;
+	while (true)
+	{
+		dirent* res = readdir(dirp);
+		if (res == nullptr)
+			break;
+		std::string name = res->d_name;
+		if (matchstr(name, ".*") == true)
+			continue;
+		std::string info = pathName + "/" + name;
+		fileInfo.push_back(info);
+		if (res->d_type == DT_DIR && isDeep == true)
+		{
+			std::string subPathName = pathName + "/" + name;
+			scan(subPathName.data(), rules, isDeep);
+		}
+	}
+	closedir(dirp);
+	return;
+}
+void DirectoryScanner::printFileInfo()
+{
+	if (fileInfo.size() == 0)
+		return;
+	for (auto& info : fileInfo)
+		std::cout << info << std::endl;
 }

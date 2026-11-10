@@ -57,3 +57,16 @@ std::string getFileModificationTime(const std::string& fileName, const std::stri
 bool setFileModificationTime(const std::string& fileName, const std::string& time);
 bool copyFile(const std::string& srcFileName, const std::string& dstFileName);
 bool matchstr(const std::string& str, const std::string& rules);
+void scanDir(const std::string& pathName);
+class DirectoryScanner
+{
+private:
+	std::vector<std::string> fileInfo;
+
+private:
+	void scan(const std::string& pathName, const std::string& rules, bool isDeep);
+
+public:
+	void scanDir(const std::string& pathName, const std::string& rules, int maxFileCount, bool isDeep);
+	void printFileInfo();
+};
