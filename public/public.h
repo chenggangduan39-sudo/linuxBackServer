@@ -64,7 +64,7 @@ private:
 	std::vector<std::string> fileInfo;
 
 private:
-	void scan(const std::string& pathName, const std::string& rules, bool isDeep);
+	void scan(const std::string& pathName, const std::string& rules, int maxFileCount, bool isDeep);
 
 public:
 	void scanDir(const std::string& pathName, const std::string& rules, int maxFileCount, bool isDeep);

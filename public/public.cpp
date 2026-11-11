@@ -416,25 +416,38 @@ bool matchstr(const std::string& str, const std::string& rules)
 	}
 	return false;
 }
-void DirectoryScanner::scan(const std::string& pathName, const std::string& rules, bool isDeep)
+void DirectoryScanner::scanDir(const std::string& pathName, const std::string& rules, int maxFileCount, bool isDeep)
+{
+	if (fileInfo.size() > 0)
+		fileInfo.clear();
+	scan(pathName, rules, maxFileCount, isDeep);
+}
+void DirectoryScanner::scan(const std::string& pathName, const std::string& rules, int maxFileCount, bool isDeep)
 {
 	DIR* dirp = opendir(pathName.data());
 	if (dirp == nullptr)
 		return;
 	while (true)
 	{
+		if (fileInfo.size() >= maxFileCount)
+			break;
 		dirent* res = readdir(dirp);
 		if (res == nullptr)
 			break;
 		std::string name = res->d_name;
 		if (matchstr(name, ".*") == true)
 			continue;
-		std::string info = pathName + "/" + name;
-		fileInfo.push_back(info);
+		if (res->d_type == DT_REG && matchstr(name, rules) == false)
+			continue;
+		else if (res->d_type == DT_REG && matchstr(name, rules) == true && fileInfo.size() < maxFileCount)
+		{
+			std::string info = pathName + "/" + name;
+			fileInfo.push_back(info);
+		}
 		if (res->d_type == DT_DIR && isDeep == true)
 		{
 			std::string subPathName = pathName + "/" + name;
-			scan(subPathName.data(), rules, isDeep);
+			scan(subPathName.data(), rules, maxFileCount, isDeep);
 		}
 	}
 	closedir(dirp);
