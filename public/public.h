@@ -2,6 +2,7 @@
 #include <string.h>
 #include <string>
 #include <vector>
+#include <fstream>
 char* deleteLeftChar(char* str, char target = ' ');
 std::string& deleteLeftChar(std::string& str, char target = ' ');
 char* deleteRightChar(char* str, char target = ' ');
@@ -61,7 +62,7 @@ void scanDir(const std::string& pathName);
 class DirectoryScanner
 {
 private:
-	std::vector<std::string> fileInfo;
+	std::vector<std::string> m_fileList;
 
 private:
 	void scan(const std::string& pathName, const std::string& rules, int maxFileCount, bool isDeep);
@@ -69,4 +70,21 @@ private:
 public:
 	void scanDir(const std::string& pathName, const std::string& rules, int maxFileCount, bool isDeep);
 	void printFileInfo();
+};
+class FileWritter
+{
+private:
+	std::ofstream ofs;
+	std::string m_fileName;
+	std::string m_tempFileName;
+
+public:
+	bool open(const std::string& fileName, std::ios::ios_base::openmode mode);
+	template <typename... Args>
+	void writeText(const char* fmt, Args... args)
+	{
+		std::string context = sformat(fmt, args);
+		ofs << context;
+	}
+	void writeBinary(const std::string& context);
 };

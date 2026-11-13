@@ -7,7 +7,6 @@
 #include <utime.h>
 #include <dirent.h>
 #include <iostream>
-#include <fstream>
 char* deleteLeftChar(char* str, char target)
 {
 	if (str == nullptr)
@@ -418,8 +417,8 @@ bool matchstr(const std::string& str, const std::string& rules)
 }
 void DirectoryScanner::scanDir(const std::string& pathName, const std::string& rules, int maxFileCount, bool isDeep)
 {
-	if (fileInfo.size() > 0)
-		fileInfo.clear();
+	if (m_fileList.size() > 0)
+		m_fileList.clear();
 	scan(pathName, rules, maxFileCount, isDeep);
 }
 void DirectoryScanner::scan(const std::string& pathName, const std::string& rules, int maxFileCount, bool isDeep)
@@ -429,7 +428,7 @@ void DirectoryScanner::scan(const std::string& pathName, const std::string& rule
 		return;
 	while (true)
 	{
-		if (fileInfo.size() >= maxFileCount)
+		if (m_fileList.size() >= maxFileCount)
 			break;
 		dirent* res = readdir(dirp);
 		if (res == nullptr)
@@ -439,10 +438,10 @@ void DirectoryScanner::scan(const std::string& pathName, const std::string& rule
 			continue;
 		if (res->d_type == DT_REG && matchstr(name, rules) == false)
 			continue;
-		else if (res->d_type == DT_REG && matchstr(name, rules) == true && fileInfo.size() < maxFileCount)
+		else if (res->d_type == DT_REG && matchstr(name, rules) == true && m_fileList.size() < maxFileCount)
 		{
 			std::string info = pathName + "/" + name;
-			fileInfo.push_back(info);
+			m_fileList.push_back(info);
 		}
 		if (res->d_type == DT_DIR && isDeep == true)
 		{
@@ -455,8 +454,24 @@ void DirectoryScanner::scan(const std::string& pathName, const std::string& rule
 }
 void DirectoryScanner::printFileInfo()
 {
-	if (fileInfo.size() == 0)
+	if (m_fileList.size() == 0)
 		return;
-	for (auto& info : fileInfo)
+	for (auto& info : m_fileList)
 		std::cout << info << std::endl;
+}
+bool FileWritter::open(const std::string& fileName, std::ios::ios_base::openmode mode)
+{
+	m_fileName = fileName;
+	m_tempFileName = fileName + ".tmp";
+	if (createDirectory(m_tempFileName, true) == false)
+		return false;
+	ofs.open(m_tempFileName, mode);
+	bool res = ofs.is_open();
+	if (res == false)
+		remove(m_tempFileName.data());
+	return res;
+}
+void FileWritter::writeBinary(const std::string& context)
+{
+	ofs.write(context.data(), context.size());
 }
